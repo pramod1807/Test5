@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine for Momo 💗</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Frutilla+One&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin:0;
+  padding:0;
+  height:100vh;
+  background: #ffe6f0;
+  font-family: 'Frutilla One', cursive;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Shooting stars */
+.star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: shoot linear infinite;
+  z-index: 1;
+}
+@keyframes shoot {
+  0% { transform: translate(0,0); opacity:1; }
+  100% { transform: translate(800px,400px) rotate(360deg); opacity:0; }
+}
+
+/* Butterflies */
+.butterfly {
+  position: absolute;
+  width: 40px;
+  animation: flutter ease-in-out infinite;
+  z-index: 2;
+}
+@keyframes flutter {
+  0% { transform: translateY(0) translateX(0) rotate(0deg);}
+  25% { transform: translateY(-10px) translateX(15px) rotate(15deg);}
+  50% { transform: translateY(0) translateX(-15px) rotate(-15deg);}
+  75% { transform: translateY(10px) translateX(15px) rotate(10deg);}
+  100% { transform: translateY(0) translateX(0) rotate(0deg);}
+}
+
+/* Card */
+.card {
+  background: white;
+  width: 280px;
+  padding: 26px;
+  border-radius: 22px;
+  box-shadow: 0 12px 30px rgba(255,105,180,0.3);
+  text-align: center;
+  position: relative;
+  margin: auto;
+  top: 50px;
+  z-index: 10;
+}
+
+h1 {
+  color: #ff3f81;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.button-row {
+  margin-bottom: 10px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap: 10px;
+}
+
+button {
+  padding: 10px 24px;
+  font-size:16px;
+  border:none;
+  border-radius:30px;
+  cursor:pointer;
+}
+
+#yesBtn {background:#ff4d88; color:white; position: relative;}
+#noBtn {background:#ffd6e8; color:#ff3f81; position:absolute; top:0;}
+
+#anger {font-size: 28px;}
+
+#message {
+  font-size:18px;
+  color:#ff2f77;
+  min-height:70px;
+  margin-top:12px;
+}
+
+.celebrate { animation: bounce 0.6s infinite alternate;}
+@keyframes bounce {
+  from {transform: translateY(0);}
+  to {transform: translateY(-10px);}
+}
+
+.hearts {
+  position:absolute;
+  font-size:18px; color:red;
+  animation: floatUp 2s linear forwards;
+  z-index: 10;
+}
+@keyframes floatUp {
+  from {transform: translateY(0) scale(1); opacity:1;}
+  to {transform: translateY(-180px) scale(1.4); opacity:0;}
+}
+
+.broken { 
+  font-size:60px; 
+  color:#ff2f77; 
+  animation:shake 0.4s infinite alternate;
+}
+@keyframes shake {
+  0% {transform: rotate(0);}
+  25% {transform: rotate(-15deg);}
+  50% {transform: rotate(15deg);}
+  75% {transform: rotate(-10deg);}
+  100% {transform: rotate(10deg);}
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Momo… will you be my Valentine? 💗</h1>
+
+  <div class="button-row">
+    <button id="yesBtn">Yes 💖</button>
+    <span id="anger">😐</span>
+  </div>
+
+  <div style="position:relative; height:50px;">
+    <button id="noBtn">No 🙈</button>
+  </div>
+
+  <div id="message"></div>
+</div>
+
+<script>
+let noCount=0, yesClicked=false, postBreak=false;
+const sequence=[]; // To track YES/NO click sequence
+const noBtn=document.getElementById("noBtn");
+const yesBtn=document.getElementById("yesBtn");
+const message=document.getElementById("message");
+const anger=document.getElementById("anger");
+const card=document.querySelector(".card");
+
+const angerEmojis=["😐","😠","😡","🤬","💢","👿","😤","😾","💥","🤯","😡😡","🤯🤯"];
+
+const flirtyLines=[
+"That NO was cute… but I see that mischievous smile 😏",
+"Clicking NO won’t save you from my charm 😘",
+"Pramod is still here, plotting his next move 💖",
+"All efforts went to waste… but you know you love it 😏",
+"You think NO can stop me? Think again 😎",
+"Every NO just makes YES sweeter 🥰",
+"Changed your mind yet? My charm works every time 😎",
+"Hmm… someone likes to play hard to get 😌",
+"Your NO button looks tired… want a break? 😁",
+"Even NO clicks can’t hide your adorable grin 😉",
+"Trying to resist me? Cute… but useless 😘",
+"I see that spark in your eyes… don’t try to hide it ✨",
+"You’re cute when you resist… but I’ll win 💕",
+"Stop testing me, or I’ll flirt even more 😜",
+"Pramod’s flirty skills are unstoppable 💕",
+"Each NO makes me more confident… about you 😍"
+];
+
+function spawnHearts(n=12){
+  for(let i=0;i<n;i++){
+    let h=document.createElement("div");
+    h.className="hearts";
+    h.textContent="❤️";
+    h.style.left=Math.random()*280+"px";
+    h.style.top="10px";
+    card.appendChild(h);
+    setTimeout(()=>h.remove(),2000);
+  }
+}
+
+noBtn.addEventListener("click",()=>{
+  noCount++;
+  sequence.push('NO');
+  
+  // Jump NO button
+  let x=Math.random()*180;
+  let y=Math.random()*40;
+  noBtn.style.left=x+"px";
+  noBtn.style.top=y+"px";
+
+  if(!yesClicked){
+    anger.textContent=angerEmojis[noCount % angerEmojis.length];
+    if(noCount>=4){
+      message.textContent=flirtyLines[(noCount-4)%flirtyLines.length];
+    }
+  } else {
+    message.innerHTML=`<div class="broken">💔</div>`;
+    postBreak=true;
+  }
+
+  // Check sequence YES-NO-YES-NO => reset
+  if(sequence.length>=4){
+    let lastFour = sequence.slice(-4);
+    if(lastFour.join('-')==='YES-NO-YES-NO'){
+      setTimeout(()=> location.reload(),1000);
+    }
+  }
+});
+
+yesBtn.addEventListener("click",()=>{
+  sequence.push('YES');
+  if(!postBreak){
+    yesClicked=true;
+    anger.textContent="😍";
+    message.innerHTML=`<div class="celebrate">🎉YAYYYY Momo!!!💗<br>Pramod is smiling so much 😍<br>Valentine unlocked✨</div>`;
+    spawnHearts(18);
+  } else {
+    message.innerHTML=`<div class="celebrate">Changed your mind now, right Momo? 😏💕</div>`;
+    anger.textContent="😍";
+    spawnHearts(20);
+    postBreak=false;
+    yesClicked=false;
+    noCount=0;
+  }
+
+  // Check sequence YES-NO-YES-NO => reset
+  if(sequence.length>=4){
+    let lastFour = sequence.slice(-4);
+    if(lastFour.join('-')==='YES-NO-YES-NO'){
+      setTimeout(()=> location.reload(),1000);
+    }
+  }
+});
+
+// Stars
+for(let i=0;i<25;i++){
+  let s=document.createElement("div");
+  s.className="star";
+  s.style.left=`${Math.random()*100}vw`;
+  s.style.top=`${Math.random()*90}vh`;
+  s.style.animationDuration=`${1+Math.random()*2}s`;
+  document.body.appendChild(s);
+}
+
+// Butterflies
+for(let i=0;i<8;i++){
+  let b=document.createElement("div");
+  b.className="butterfly";
+  b.style.left=`${Math.random()*90}vw`;
+  b.style.top=`${Math.random()*80}vh`;
+  b.style.animationDuration=`${4+Math.random()*4}s`;
+  b.innerHTML = `<svg viewBox="0 0 64 64" width="40" height="40">
+      <path fill="#ff69b4" d="M32 2C20 2 12 20 12 32s8 30 20 30 20-18 20-30S44 2 32 2z"/>
+  </svg>`;
+  document.body.appendChild(b);
+}
+</script>
+
+</body>
+</html>
